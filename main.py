@@ -57,6 +57,7 @@ def fermer_tab():
     pydirectinput.press('tab')  
     time.sleep(1)
 
+def detecter_image(image_path, confidence=0.8):
     screenshot = np.array(ImageGrab.grab())
     screenshot = cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR)
 
