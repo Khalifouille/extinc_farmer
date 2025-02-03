@@ -46,6 +46,14 @@ def ramasser_loot():
         time.sleep(0.5)
     time.sleep(1)
 
+def ouvrir_tab():
+    pydirectinput.press('tab')  
+    time.sleep(1)
+
+def fermer_tab():
+    pydirectinput.press('tab')  
+    time.sleep(1)
+
 def on_f11_press(event):
     if event.name == 'f11':
         print("STOP STOP")
@@ -64,6 +72,13 @@ def main():
             viser_et_lancer_molotov()
             time.sleep(1)
             ramasser_loot()
+            time.sleep(1)
+            ouvrir_tab()
+            time.sleep(1)
+
+
+
+            fermer_tab()
             time.sleep(1)
             ranger_arme()
             print("Attends 5 minutes maintenant !")
