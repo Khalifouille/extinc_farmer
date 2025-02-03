@@ -101,8 +101,11 @@ def main():
         zone_ecran = (126, 115, 1798, 539)
 
         images_a_detecter = [
-            "bandage.png", 
-            "kevlar.png"
+            "caisse.png", 
+            "kevlar.png",
+            "antizin_shot.png",
+            "flesh_dot.png",
+            "berserker_shot.png"
         ]
 
         while True:
@@ -113,6 +116,8 @@ def main():
             ouvrir_tab()
             time.sleep(1)
 
+## CHECK SI IMAGE EST SUR ECRAN EN BOUCLE JUSQUA PLUS D'IMAGE A DETECTER ##
+
             for image_path in images_a_detecter:
                 while True:
                     position = detecter_image(image_path, zone_ecran)
@@ -121,6 +126,9 @@ def main():
                         cliquer_sur_position(x, y) 
                     else:
                         break
+
+## ------------------------------------------------------------------------ ##
+
 
             fermer_tab()
             time.sleep(1)
