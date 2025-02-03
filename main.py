@@ -58,24 +58,19 @@ def fermer_tab():
     time.sleep(1)
 
 def detecter_image(image_path, zone, confidence=0.8):
-
     screenshot = np.array(ImageGrab.grab(bbox=zone))
     screenshot = cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR)
     template = cv2.imread(image_path, cv2.IMREAD_COLOR)
     if template is None:
-        print(f"Erreur : Impossible de charger l'image {image_path}.")
         return None
     result = cv2.matchTemplate(screenshot, template, cv2.TM_CCOEFF_NORMED)
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-
     if max_val >= confidence:
         x, y = max_loc
         x += zone[0]
         y += zone[1]
-        print(f"Score de confiance de {max_val:.2f}.")
         return (x, y)
     else:
-        print(f"Image non détectée (meilleur score de confiance : {max_val:.2f}).")
         return False
 
 def cliquer_sur_position(x, y):
@@ -92,7 +87,6 @@ def clique_marcher():
 
 def on_f11_press(event):
     if event.name == 'f11':
-        print("STOP STOP")
         keyboard.unhook_all() 
         os._exit(0)  
 
@@ -103,7 +97,13 @@ def main():
         mettre_fivem_premier_plan()
         time.sleep(2)
         prendre_arme()
+        
         zone_ecran = (126, 115, 1798, 539)
+
+        images_a_detecter = [
+            "bandage.png", 
+            "kevlar.png"
+        ]
 
         while True:
             viser_et_lancer_molotov()
@@ -113,27 +113,19 @@ def main():
             ouvrir_tab()
             time.sleep(1)
 
-
-            
-            image_path = "bandage.png"  
-            position = detecter_image(image_path, zone_ecran)
-            if position:
-                x, y = position
-                print(f"Je clique ici : ({x}, {y})")
-                cliquer_sur_position(x, y)
-            else:
-                print("L'image n'a pas été détectée dans la zone spécifiée.")
-            time.sleep(1)
-
-
-            ## clique_marcher() -- Utilisation plus tard tkt
-
+            for image_path in images_a_detecter:
+                while True:
+                    position = detecter_image(image_path, zone_ecran)
+                    if position:
+                        x, y = position
+                        cliquer_sur_position(x, y) 
+                    else:
+                        break
 
             fermer_tab()
             time.sleep(1)
             ranger_arme()
-            print("Attends 5 minutes maintenant !")
-            time.sleep(10)  
+            time.sleep(300)  
     else:
         sys.exit()
 
