@@ -40,6 +40,12 @@ def viser_et_lancer_molotov():
     pydirectinput.mouseUp(button='left') 
     pydirectinput.mouseUp(button='right')  
 
+def ramasser_loot():
+    for _ in range(15):
+        pydirectinput.press('e')  
+        time.sleep(0.5)
+    time.sleep(1)
+
 def on_f11_press(event):
     if event.name == 'f11':
         print("STOP STOP")
@@ -57,8 +63,10 @@ def main():
         while True:
             viser_et_lancer_molotov()
             time.sleep(1)
+            ramasser_loot()
+            time.sleep(1)
             ranger_arme()
-            print("Attends 5minutes maintenant !")
+            print("Attends 5 minutes maintenant !")
             time.sleep(10)  
     else:
         sys.exit()
