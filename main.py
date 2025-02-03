@@ -57,15 +57,14 @@ def fermer_tab():
     pydirectinput.press('tab')  
     time.sleep(1)
 
-def detecter_image(image_path, confidence=0.8):
-    screenshot = np.array(ImageGrab.grab())
-    screenshot = cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR)
+def detecter_image(image_path, zone, confidence=0.8):
 
+    screenshot = np.array(ImageGrab.grab(bbox=zone))
+    screenshot = cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR)
     template = cv2.imread(image_path, cv2.IMREAD_COLOR)
     if template is None:
         print(f"Erreur : Impossible de charger l'image {image_path}.")
         return False
-
     result = cv2.matchTemplate(screenshot, template, cv2.TM_CCOEFF_NORMED)
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
 
@@ -89,6 +88,7 @@ def main():
         mettre_fivem_premier_plan()
         time.sleep(2)
         prendre_arme()
+        zone_ecran = (126, 115, 1798, 539)
 
         while True:
             viser_et_lancer_molotov()
@@ -98,9 +98,10 @@ def main():
             ouvrir_tab()
             time.sleep(1)
 
+
             
             image_path = "bandage.png"  
-            if detecter_image(image_path):
+            if detecter_image(image_path, zone_ecran):
                 print("L'image a été détectée avec succès !")
             else:
                 print("L'image n'a pas été détectée.")
