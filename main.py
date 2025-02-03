@@ -84,6 +84,12 @@ def cliquer_sur_position(x, y):
     pydirectinput.click()
     time.sleep(0.5)
 
+def clique_marcher():
+    pydirectinput.moveTo(1102, 52) 
+    time.sleep(0.1)
+    pydirectinput.click()
+    time.sleep(0.1)
+
 def on_f11_press(event):
     if event.name == 'f11':
         print("STOP STOP")
@@ -117,6 +123,10 @@ def main():
                 cliquer_sur_position(x, y)
             else:
                 print("L'image n'a pas été détectée dans la zone spécifiée.")
+            time.sleep(1)
+
+
+            ## clique_marcher() -- Utilisation plus tard tkt
 
 
             fermer_tab()
