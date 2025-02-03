@@ -1,5 +1,12 @@
 import pyautogui
 import time
+import psutil
+
+def fivem_lance():
+    for process in psutil.process_iter(['pid', 'name']):
+        if process.info['name'] == 'FiveM.exe':  
+            return True
+    return False
 
 def prendre_arme():
     pyautogui.press('1')
@@ -24,6 +31,15 @@ def automatiser_actions():
     viser_et_lancer_molotov()
     ranger_arme()
 
-while True:
-    automatiser_actions()
-    time.sleep(5)
+def main():
+    while True:
+        if fivem_lance():
+            print("FiveM est lancé")
+            automatiser_actions()
+            time.sleep(5)  
+        else:
+            print("FiveM n'est pas lancé")
+            time.sleep(10)
+
+if __name__ == "__main__":
+    main()
