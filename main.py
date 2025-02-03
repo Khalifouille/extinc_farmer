@@ -6,6 +6,9 @@ import os
 import win32gui
 import win32con
 import pydirectinput
+import cv2
+import numpy as np
+from PIL import ImageGrab
 
 def est_fivem_lance():
     for process in psutil.process_iter(['pid', 'name']):
@@ -54,6 +57,24 @@ def fermer_tab():
     pydirectinput.press('tab')  
     time.sleep(1)
 
+    screenshot = np.array(ImageGrab.grab())
+    screenshot = cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR)
+
+    template = cv2.imread(image_path, cv2.IMREAD_COLOR)
+    if template is None:
+        print(f"Erreur : Impossible de charger l'image {image_path}.")
+        return False
+
+    result = cv2.matchTemplate(screenshot, template, cv2.TM_CCOEFF_NORMED)
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+
+    if max_val >= confidence:
+        print(f"Image détectée avec un score de confiance de {max_val:.2f}.")
+        return True
+    else:
+        print(f"Image non détectée (meilleur score de confiance : {max_val:.2f}).")
+        return False
+
 def on_f11_press(event):
     if event.name == 'f11':
         print("STOP STOP")
@@ -76,6 +97,12 @@ def main():
             ouvrir_tab()
             time.sleep(1)
 
+            
+            image_path = "bandage.png"  
+            if detecter_image(image_path):
+                print("L'image a été détectée avec succès !")
+            else:
+                print("L'image n'a pas été détectée.")
 
 
             fermer_tab()
