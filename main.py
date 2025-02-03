@@ -1,14 +1,25 @@
 import pyautogui
 import time
-import 1
+import psutil
 import keyboard
 import sys
+import os
+import win32gui
+import win32con
 
-def fivem_lance():
+def est_fivem_lance():
     for process in psutil.process_iter(['pid', 'name']):
         if process.info['name'] == 'FiveM.exe':
             return True
     return False
+
+def mettre_fivem_premier_plan():
+    def callback(hwnd, extra):
+        if win32gui.IsWindowVisible(hwnd):
+            if "FiveM" in win32gui.GetWindowText(hwnd):
+                win32gui.SetForegroundWindow(hwnd)
+                win32gui.ShowWindow(hwnd, win32con.SW_MAXIMIZE)
+    win32gui.EnumWindows(callback, None)
 
 def prendre_arme():
     pyautogui.press('1')
@@ -33,22 +44,22 @@ def automatiser_actions():
     viser_et_lancer_molotov()
     ranger_arme()
 
-def verifier_arret():
-    if keyboard.is_pressed('f11'):
-        print("Arrêt du script")
-        sys.exit() 
+def on_f11_press(event):
+    if event.name == 'f11':
+        print("Touche F11 détectée. Arrêt du script...")
+        keyboard.unhook_all()  
+        os._exit(0)
 
 def main():
-    while True:
-        if fivem_lance():
-            print("FiveM est lancé")
-            automatiser_actions()
-            time.sleep(5) 
-        else:
-            print("FiveM n'est pas lancé")
-            time.sleep(10)
+    keyboard.on_press(on_f11_press)
 
-        verifier_arret()
+    while True:
+        if est_fivem_lance():
+            mettre_fivem_premier_plan()
+            automatiser_actions()
+            time.sleep(5)
+        else:
+            time.sleep(10)
 
 if __name__ == "__main__":
     main()
