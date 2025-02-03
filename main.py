@@ -44,10 +44,10 @@ def viser_et_lancer_molotov():
     pydirectinput.mouseUp(button='right')  
 
 def ramasser_loot():
-    for _ in range(15):
+    for _ in range(30):
         pydirectinput.press('e')  
-        time.sleep(0.5)
-    time.sleep(1)
+        time.sleep(0.1)
+    time.sleep(0.1)
 
 def ouvrir_tab():
     pydirectinput.press('tab')  
@@ -64,16 +64,25 @@ def detecter_image(image_path, zone, confidence=0.8):
     template = cv2.imread(image_path, cv2.IMREAD_COLOR)
     if template is None:
         print(f"Erreur : Impossible de charger l'image {image_path}.")
-        return False
+        return None
     result = cv2.matchTemplate(screenshot, template, cv2.TM_CCOEFF_NORMED)
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
 
     if max_val >= confidence:
-        print(f"Image détectée avec un score de confiance de {max_val:.2f}.")
-        return True
+        x, y = max_loc
+        x += zone[0]
+        y += zone[1]
+        print(f"Score de confiance de {max_val:.2f}.")
+        return (x, y)
     else:
         print(f"Image non détectée (meilleur score de confiance : {max_val:.2f}).")
         return False
+
+def cliquer_sur_position(x, y):
+    pydirectinput.moveTo(x, y) 
+    time.sleep(0.2)
+    pydirectinput.click()
+    time.sleep(0.5)
 
 def on_f11_press(event):
     if event.name == 'f11':
@@ -101,10 +110,13 @@ def main():
 
             
             image_path = "bandage.png"  
-            if detecter_image(image_path, zone_ecran):
-                print("L'image a été détectée avec succès !")
+            position = detecter_image(image_path, zone_ecran)
+            if position:
+                x, y = position
+                print(f"Je clique ici : ({x}, {y})")
+                cliquer_sur_position(x, y)
             else:
-                print("L'image n'a pas été détectée.")
+                print("L'image n'a pas été détectée dans la zone spécifiée.")
 
 
             fermer_tab()
