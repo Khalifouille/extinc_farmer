@@ -46,7 +46,6 @@ def viser_et_lancer_molotov():
 def ramasser_loot():
     for _ in range(30):
         pydirectinput.press('e')  
-        time.sleep(0.1)
     time.sleep(0.1)
 
 def ouvrir_tab():
@@ -56,6 +55,14 @@ def ouvrir_tab():
 def fermer_tab():
     pydirectinput.press('tab')  
     time.sleep(1)
+
+def supprimer_item():
+    for _ in range(50):
+        pydirectinput.moveTo(244, 194) 
+        time.sleep(0.1)
+        pydirectinput.click(button='right')
+        pydirectinput.click(button='right')
+        time.sleep(0.1)
 
 def detecter_image(image_path, zone, confidence=0.8):
     screenshot = np.array(ImageGrab.grab(bbox=zone))
@@ -97,15 +104,21 @@ def main():
         mettre_fivem_premier_plan()
         time.sleep(2)
         prendre_arme()
-        
+
         zone_ecran = (126, 115, 1798, 539)
+        zone_ecran2 = (124, 555 , 1805, 869)
 
         images_a_detecter = [
             "caisse.png", 
             "kevlar.png",
             "antizin_shot.png",
             "flesh_dot.png",
-            "berserker_shot.png"
+            "berserker_shot.png",
+            "molotov.png"
+        ]
+
+        images_a_return = [
+            "molotov.png"
         ]
 
         while True:
@@ -126,13 +139,24 @@ def main():
                         cliquer_sur_position(x, y) 
                     else:
                         break
+                    supprimer_item()
+
+## CHECK SI IMAGE A RETURN EST SUR ECRAN EN BOUCLE JUSQUA PLUS D'IMAGE A DETECTER ##
+
+                for image_path in images_a_return:
+                    while True:
+                        position = detecter_image(image_path, zone_ecran2)
+                        if position:
+                            x, y = position
+                            cliquer_sur_position(x, y) 
+                        else:
+                            break
 
 ## ------------------------------------------------------------------------ ##
 
-
             fermer_tab()
             time.sleep(1)
-            ranger_arme()
+            prendre_arme()
             time.sleep(300)  
     else:
         sys.exit()
