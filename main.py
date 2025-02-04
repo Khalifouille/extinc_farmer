@@ -9,6 +9,7 @@ import pydirectinput
 import cv2
 import numpy as np
 from PIL import ImageGrab
+import pytesseract
 
 def est_fivem_lance():
     for process in psutil.process_iter(['pid', 'name']):
@@ -63,6 +64,13 @@ def supprimer_item():
         pydirectinput.click(button='right')
         pydirectinput.click(button='right')
         time.sleep(0.1)
+
+def detecter_texte(zone):
+    screenshot = np.array(ImageGrab.grab(bbox=zone))
+    screenshot = cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR)
+    gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
+    texte = pytesseract.image_to_string(gray)
+    return texte.strip()
 
 def detecter_image(image_path, zone, confidence=0.8):
     screenshot = np.array(ImageGrab.grab(bbox=zone))
@@ -180,8 +188,16 @@ def main():
                         time.sleep(1)
                     else:
                         break
+
+            zone_texte = (1669, 551, 1719, 581)  
+            texte_detecte = detecter_texte(zone_texte)
+            if texte_detecte:
+                print(f"Texte détecté : {texte_detecte}")
+            else:
+                print("Aucun texte détecté.")
 ## ---------------------------------------------------------------------------------------------
 
+            time.sleep(1)
             fermer_tab()
             time.sleep(1)
             prendre_arme()
