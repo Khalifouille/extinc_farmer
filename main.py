@@ -91,8 +91,6 @@ def clique_marcher():
     pydirectinput.moveTo(1102, 52) 
     time.sleep(0.1)
     pydirectinput.click()
-    time.sleep(0.1)
-    fermer_tab()
     time.sleep(1)
 
 def actualier_reclamer():
@@ -104,6 +102,8 @@ def actualier_reclamer():
     pydirectinput.click(1073, 475)
     time.sleep(0.1)
     pydirectinput.click(882, 475)
+    time.sleep(0.1)
+    fermer_tab()
     time.sleep(1)
 
 def on_f11_press(event):
@@ -143,7 +143,6 @@ def main():
         start_time = time.time()
 
         while True:
-
             if time.time() - start_time >= 180:
                 print("Vente au marché !")
                 actualier_reclamer()
@@ -167,7 +166,7 @@ def main():
                         time.sleep(1)
                     else:
                         break
-            
+
             supprimer_item()
 
 ## CHECK SI IMAGE A RETURN EST SUR ECRAN EN BOUCLE JUSQUA PLUS D'IMAGE A DETECTER ##
@@ -181,9 +180,7 @@ def main():
                         time.sleep(1)
                     else:
                         break
-
-
-## ------------------------------------------------------------------------ ##
+## ---------------------------------------------------------------------------------------------
 
             fermer_tab()
             time.sleep(1)
