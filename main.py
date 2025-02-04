@@ -114,14 +114,27 @@ def main():
             "antizin_shot.png",
             "flesh_dot.png",
             "berserker_shot.png",
-            "molotov.png"
+            "molotov.png",
+            "carabine_mk2.png",
+            "mitralleuse.png",
+            "carabine_spe.png",
+            "carabine.png",
+            "cog.png"
         ]
 
         images_a_return = [
             "molotov.png"
         ]
 
+        start_time = time.time()
+
         while True:
+
+            if time.time() - start_time >= 180:
+                print("Vente au marché !")
+                clique_marcher()
+                start_time = time.time()
+
             viser_et_lancer_molotov()
             time.sleep(1)
             ramasser_loot()
@@ -161,7 +174,7 @@ def main():
             fermer_tab()
             time.sleep(1)
             prendre_arme()
-            time.sleep(300)  
+            time.sleep(120)  
     else:
         sys.exit()
 
