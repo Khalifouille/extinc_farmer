@@ -44,7 +44,7 @@ def viser_et_lancer_molotov():
     pydirectinput.mouseUp(button='right')  
 
 def ramasser_loot():
-    for _ in range(30):
+    for _ in range(50):
         pydirectinput.press('e')  
     time.sleep(0.1)
 
@@ -57,7 +57,7 @@ def fermer_tab():
     time.sleep(1)
 
 def supprimer_item():
-    for _ in range(50):
+    for _ in range(25):
         pydirectinput.moveTo(244, 194) 
         time.sleep(0.1)
         pydirectinput.click(button='right')
@@ -82,7 +82,7 @@ def detecter_image(image_path, zone, confidence=0.8):
 
 def cliquer_sur_position(x, y):
     pydirectinput.moveTo(x, y) 
-    time.sleep(0.2)
+    time.sleep(0.1)
     pydirectinput.click()
     time.sleep(0.5)
 
@@ -137,20 +137,24 @@ def main():
                     if position:
                         x, y = position
                         cliquer_sur_position(x, y) 
+                        time.sleep(1)
                     else:
                         break
-                    supprimer_item()
+            
+            supprimer_item()
 
 ## CHECK SI IMAGE A RETURN EST SUR ECRAN EN BOUCLE JUSQUA PLUS D'IMAGE A DETECTER ##
 
-                for image_path in images_a_return:
-                    while True:
-                        position = detecter_image(image_path, zone_ecran2)
-                        if position:
-                            x, y = position
-                            cliquer_sur_position(x, y) 
-                        else:
-                            break
+            for image_path in images_a_return:
+                while True:
+                    position = detecter_image(image_path, zone_ecran2)
+                    if position:
+                        x, y = position
+                        cliquer_sur_position(x, y) 
+                        time.sleep(1)
+                    else:
+                        break
+
 
 ## ------------------------------------------------------------------------ ##
 
