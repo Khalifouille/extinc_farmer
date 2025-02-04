@@ -44,7 +44,7 @@ def viser_et_lancer_molotov():
     pydirectinput.mouseUp(button='right')  
 
 def ramasser_loot():
-    for _ in range(50):
+    for _ in range(60):
         pydirectinput.press('e')  
     time.sleep(0.1)
 
@@ -57,7 +57,7 @@ def fermer_tab():
     time.sleep(1)
 
 def supprimer_item():
-    for _ in range(25):
+    for _ in range(28):
         pydirectinput.moveTo(244, 194) 
         time.sleep(0.1)
         pydirectinput.click(button='right')
@@ -87,10 +87,24 @@ def cliquer_sur_position(x, y):
     time.sleep(0.5)
 
 def clique_marcher():
+    ouvrir_tab()
     pydirectinput.moveTo(1102, 52) 
     time.sleep(0.1)
     pydirectinput.click()
     time.sleep(0.1)
+    fermer_tab()
+    time.sleep(1)
+
+def actualier_reclamer():
+    time.sleep(0.1)
+    clique_marcher()
+    time.sleep(0.1)
+    pydirectinput.click(1012, 139)
+    time.sleep(0.1)
+    pydirectinput.click(1073, 475)
+    time.sleep(0.1)
+    pydirectinput.click(882, 475)
+    time.sleep(1)
 
 def on_f11_press(event):
     if event.name == 'f11':
@@ -132,7 +146,7 @@ def main():
 
             if time.time() - start_time >= 180:
                 print("Vente au marché !")
-                clique_marcher()
+                actualier_reclamer()
                 start_time = time.time()
 
             viser_et_lancer_molotov()
