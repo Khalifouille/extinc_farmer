@@ -70,15 +70,11 @@ def detecter_texte(zone, dossier_images="captures_texte"):
         os.makedirs(dossier_images)
     screenshot = np.array(ImageGrab.grab(bbox=zone))
     screenshot = cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR)
-    timestamp = time.strftime("%Y%m%d_%H%M%S")
-    chemin_image = os.path.join(dossier_images, f"capture_{timestamp}.png")
-    chemin_image2 = os.path.join(dossier_images, f"capture_modifier_{timestamp}.png")
+    ## timestamp = time.strftime("%Y%m%d_%H%M%S")
+    chemin_image = os.path.join(dossier_images, "capture.png")
     cv2.imwrite(chemin_image, screenshot)
     print(f"Image enregistrée : {chemin_image}")
-    gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
-    cv2.imwrite(chemin_image2, gray)
-    print(f"Image modifier enregistrée : {chemin_image}")
-    texte = pytesseract.image_to_string(gray)
+    texte = pytesseract.image_to_string(screenshot)
     return texte.strip()
 
 def detecter_image(image_path, zone, confidence=0.8):
