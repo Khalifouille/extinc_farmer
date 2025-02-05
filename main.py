@@ -138,21 +138,21 @@ def main():
         zone_ecran2 = (124, 555 , 1805, 869)
 
         images_a_detecter = [
-            "caisse.png", 
-            "kevlar.png",
-            "antizin_shot.png",
-            "flesh_dot.png",
-            "berserker_shot.png",
-            "molotov.png",
-            "carabine_mk2.png",
-            "mitralleuse.png",
-            "carabine_spe.png",
-            "carabine.png",
-            "cog.png"
+            "images_loot/caisse.png", 
+            "images_loot/kevlar.png",
+            "images_loot/antizin_shot.png",
+            "images_loot/flesh_dot.png",
+            "images_loot/berserker_shot.png",
+            "images_loot/molotov.png",
+            "images_loot/carabine_mk2.png",
+            "images_loot/mitralleuse.png",
+            "images_loot/carabine_spe.png",
+            "images_loot/carabine.png",
+            "images_loot/cog.png"
         ]
 
         images_a_return = [
-            "molotov.png"
+            "images_loot/molotov.png"
         ]
 
         start_time = time.time()
