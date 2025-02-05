@@ -65,10 +65,19 @@ def supprimer_item():
         pydirectinput.click(button='right')
         time.sleep(0.1)
 
-def detecter_texte(zone):
+def detecter_texte(zone, dossier_images="captures_texte"):
+    if not os.path.exists(dossier_images):
+        os.makedirs(dossier_images)
     screenshot = np.array(ImageGrab.grab(bbox=zone))
     screenshot = cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR)
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
+    chemin_image = os.path.join(dossier_images, f"capture_{timestamp}.png")
+    chemin_image2 = os.path.join(dossier_images, f"capture_modifier_{timestamp}.png")
+    cv2.imwrite(chemin_image, screenshot)
+    print(f"Image enregistrée : {chemin_image}")
     gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
+    cv2.imwrite(chemin_image2, gray)
+    print(f"Image modifier enregistrée : {chemin_image}")
     texte = pytesseract.image_to_string(gray)
     return texte.strip()
 
