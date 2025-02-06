@@ -82,25 +82,20 @@ def detecter_texte(zone, dossier_images="captures_texte"):
 def detecter_texte2(zone, dossier_images="captures_texte"):
     if not os.path.exists(dossier_images):
         os.makedirs(dossier_images)
-
     screenshot = np.array(ImageGrab.grab(bbox=zone))
     screenshot = cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR)
-
     chemin_image2 = os.path.join(dossier_images, f"capture_prix.png")
     cv2.imwrite(chemin_image2, screenshot)
-
-    gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)  
-    _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)  
-    blur = cv2.GaussianBlur(binary, (3, 3), 0)  
-
+    gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY) 
+    _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    blur = cv2.GaussianBlur(binary, (3, 3), 0)
     kernel = np.ones((2, 2), np.uint8)
-    dilated = cv2.dilate(blur, kernel, iterations=1)  
-
+    dilated = cv2.dilate(blur, kernel, iterations=1)
     chemin_image_pretraitee = os.path.join(dossier_images, f"capture_prix_pretraitee.png")
     cv2.imwrite(chemin_image_pretraitee, dilated)
-
-    custom_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789.,'  
+    custom_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789.,$'  
     texte = pytesseract.image_to_string(dilated, config=custom_config)
+    texte = texte.replace("9$", "$") 
     return texte.strip()
 
 def detecter_image(image_path, zone, confidence=0.8):
@@ -186,21 +181,36 @@ def vente_inv_plein():
                 texte_detecte = detecter_texte2(zone_texte)
                 if texte_detecte:       
                     print(f"Texte détecté : {texte_detecte}")
-                    match = re.search(r'\$\d{1,3}(?:,\d{3})*', texte_detecte)
-                    if match:
-                        prix_str = match.group().replace('$', '')
-                        prix = int(prix_str.replace(',', ''))
-                        print(prix)
-                        print(prix-1)
-                        prix_vente = prix-1
-                        cliquer_sur_position(1528, 344)
-                        pydirectinput.keyDown("ctrl")
-                        pydirectinput.press("a") 
-                        pydirectinput.keyUp("ctrl") 
-                        time.sleep(0.1)
-                        pydirectinput.write(str(prix_vente))
-                        cliquer_sur_position(1809, 403)
+                    
+                    match_avec_symbole = re.search(r'\$\d{1,3}(?:[.,]\d{3})*', texte_detecte)
+                    match_sans_symbole = re.search(r'\d{1,3}(?:[.,]\d{3})*', texte_detecte)
+
+                    if match_avec_symbole:
+                        prix_str = match_avec_symbole.group().replace('$', '').replace('.', '').replace(',', '')
+                        prix = int(prix_str)
+                        print(f"Prix détecté (avec symbole $) : {prix}")
+                    elif match_sans_symbole:
+                        prix_str = match_sans_symbole.group().replace('.', '').replace(',', '')
+                        prix = int(prix_str)
+                        print(f"Prix détecté (sans symbole $) : {prix}")
+                    else:
+                        print("Aucun prix détecté dans le texte.")
+                        break
+
+                    prix_vente = prix - 1
+                    print(f"Prix de vente : {prix_vente}")
+
+                    cliquer_sur_position(1528, 344)
+                    pydirectinput.keyDown("ctrl")
+                    pydirectinput.press("a") 
+                    pydirectinput.keyUp("ctrl") 
+                    time.sleep(0.1)
+                    pydirectinput.write(str(prix_vente))
+                    cliquer_sur_position(1809, 403)
+                else:
+                    print("Aucun texte détecté dans la zone spécifiée.")
             else:
+                print("Aucune image détectée.")
                 break
     
 def on_f11_press(event):
