@@ -41,7 +41,7 @@ def viser_et_lancer_molotov():
     pydirectinput.mouseDown(button='right')  
     time.sleep(1)
     pydirectinput.mouseDown(button='left')  
-    time.sleep(0.5)
+    time.sleep(0.1)
     pydirectinput.mouseUp(button='left') 
     pydirectinput.mouseUp(button='right')  
 
@@ -64,7 +64,6 @@ def supprimer_item():
         time.sleep(0.1)
         pydirectinput.click(button='right')
         pydirectinput.click(button='right')
-        time.sleep(0.1)
 
 def detecter_texte(zone, dossier_images="captures_texte"):
     if not os.path.exists(dossier_images):
@@ -73,6 +72,20 @@ def detecter_texte(zone, dossier_images="captures_texte"):
     screenshot = cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR)
     chemin_image = os.path.join(dossier_images, f"capture_kg.png")
     cv2.imwrite(chemin_image, screenshot)
+    ## print(f"Image enregistrée : {chemin_image}")
+    ## gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
+    ## gray = cv2.GaussianBlur(gray, (5, 5), 0)
+    ## _, gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    texte = pytesseract.image_to_string(screenshot, config='--psm 6')
+    return texte.strip()
+
+def detecter_texte2(zone, dossier_images="captures_texte"):
+    if not os.path.exists(dossier_images):
+        os.makedirs(dossier_images)
+    screenshot = np.array(ImageGrab.grab(bbox=zone))
+    screenshot = cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR)
+    chemin_image2 = os.path.join(dossier_images, f"capture_prix.png")
+    cv2.imwrite(chemin_image2, screenshot)
     ## print(f"Image enregistrée : {chemin_image}")
     ## gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
     ## gray = cv2.GaussianBlur(gray, (5, 5), 0)
@@ -100,7 +113,7 @@ def cliquer_sur_position(x, y):
     pydirectinput.moveTo(x, y) 
     time.sleep(0.1)
     pydirectinput.click()
-    time.sleep(0.5)
+    time.sleep(0.1)
 
 def clique_marcher():
     ouvrir_tab()
@@ -152,6 +165,11 @@ def vente_inv_plein():
                         x, y = position
                         cliquer_sur_position(x, y) 
                         time.sleep(1)
+                        zone_texte = (1721, 563, 1776, 581)  
+                        texte_detecte = detecter_texte2(zone_texte)
+                        if texte_detecte:   
+                            print(f"Texte détecté : {texte_detecte}")
+                            match = re.search(r'\d+', texte_detecte)
                     else:
                         break
 
@@ -245,9 +263,9 @@ def main():
             texte_detecte = detecter_texte(zone_texte)
             if texte_detecte:
                 print(f"Texte détecté : {texte_detecte}")
-                match = re.search(r'\d+', texte_detecte)
+                match = re.search(r'(\d+)(?:[.,]\d+)?kg', texte_detecte)
                 if match:
-                    poids = int(match.group())
+                    poids = int(match.group(1))
                     if poids >= 30:
                         print("+30kg")
                         vente_inv_plein()
