@@ -85,16 +85,22 @@ def detecter_texte2(zone, dossier_images="captures_texte"):
 
     screenshot = np.array(ImageGrab.grab(bbox=zone))
     screenshot = cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR)
-    chemin_image2 = os.path.join(dossier_images, f"capture_prix.png")
-    
-    cv2.imwrite(chemin_image2, screenshot)
-    gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)  
-    _, binary = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    blur = cv2.GaussianBlur(binary, (3, 3), 0) 
-    chemin_image_pretraitee = os.path.join(dossier_images, f"capture_prix_pretraitee.png")
-    cv2.imwrite(chemin_image_pretraitee, blur)
-    texte = pytesseract.image_to_string(blur, config='--psm 6') 
 
+    chemin_image2 = os.path.join(dossier_images, f"capture_prix.png")
+    cv2.imwrite(chemin_image2, screenshot)
+
+    gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)  
+    _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)  
+    blur = cv2.GaussianBlur(binary, (3, 3), 0)  
+
+    kernel = np.ones((2, 2), np.uint8)
+    dilated = cv2.dilate(blur, kernel, iterations=1)  
+
+    chemin_image_pretraitee = os.path.join(dossier_images, f"capture_prix_pretraitee.png")
+    cv2.imwrite(chemin_image_pretraitee, dilated)
+
+    custom_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789.,'  
+    texte = pytesseract.image_to_string(dilated, config=custom_config)
     return texte.strip()
 
 def detecter_image(image_path, zone, confidence=0.8):
