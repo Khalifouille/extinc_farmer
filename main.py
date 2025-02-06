@@ -165,11 +165,14 @@ def vente_inv_plein():
                         x, y = position
                         cliquer_sur_position(x, y) 
                         time.sleep(1)
-                        zone_texte = (1721, 563, 1776, 581)  
+                        zone_texte = (1717, 548, 1823, 593)  
                         texte_detecte = detecter_texte2(zone_texte)
                         if texte_detecte:   
                             print(f"Texte détecté : {texte_detecte}")
-                            match = re.search(r'\d+', texte_detecte)
+                            match = re.search(r'\d{1,3}(?:,\d{3})*', texte_detecte)
+                            if match:
+                                prix = int(match.group().replace(',', '')) 
+                                print(prix-1)
                     else:
                         break
 
@@ -257,17 +260,17 @@ def main():
                         cliquer_sur_position(x, y) 
                         time.sleep(1)
                     else:
-                        break
+                        break       
 
             zone_texte = (1665, 115, 1719, 133)  
             texte_detecte = detecter_texte(zone_texte)
             if texte_detecte:
-                print(f"Texte détecté : {texte_detecte}")
-                match = re.search(r'(\d+)(?:[.,]\d+)?kg', texte_detecte)
+                # print(f"Texte détecté : {texte_detecte}")
+                match = re.search(r'\b(\d+)(?:[.,]\d+)?kg\b', texte_detecte)
                 if match:
                     poids = int(match.group(1))
                     if poids >= 30:
-                        print("+30kg")
+                        print(poids)
                         vente_inv_plein()
             else:
                 print("Aucun texte détecté.")
