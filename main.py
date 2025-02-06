@@ -173,6 +173,15 @@ def vente_inv_plein():
                             if match:
                                 prix = int(match.group().replace(',', '')) 
                                 print(prix-1)
+                                prix_vente = prix-1
+                                cliquer_sur_position(1528, 344)
+                                pydirectinput.keyDown("ctrl")
+                                pydirectinput.press("a") 
+                                pydirectinput.keyUp("ctrl") 
+                                time.sleep(0.1)
+                                pydirectinput.write(str(prix_vente))
+                                cliquer_sur_position(1809, 403)
+
                     else:
                         break
 
