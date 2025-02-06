@@ -10,6 +10,7 @@ import cv2
 import numpy as np
 from PIL import ImageGrab
 import pytesseract
+import re
 
 def est_fivem_lance():
     for process in psutil.process_iter(['pid', 'name']):
@@ -200,6 +201,11 @@ def main():
             texte_detecte = detecter_texte(zone_texte)
             if texte_detecte:
                 print(f"Texte détecté : {texte_detecte}")
+                match = re.search(r'\d+', texte_detecte)
+                if match:
+                    poids = int(match.group())
+                    if poids >= 30:
+                        print("+30kg")
             else:
                 print("Aucun texte détecté.")
 ## ---------------------------------------------------------------------------------------------
