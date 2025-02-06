@@ -157,34 +157,40 @@ def vente_inv_plein():
         ]
         
     zone_ecran3 = (31, 172, 1185, 433)
-    
+    zone_texte_arret = (1519, 945, 1901, 1024)  
+
     for image_path in images_a_detecter:
-                while True:
-                    position = detecter_image(image_path, zone_ecran3)
-                    if position:
-                        x, y = position
-                        cliquer_sur_position(x, y) 
-                        time.sleep(1)
-                        zone_texte = (1717, 548, 1823, 593)  
-                        texte_detecte = detecter_texte2(zone_texte)
-                        if texte_detecte:   
-                            print(f"Texte détecté : {texte_detecte}")
-                            match = re.search(r'\d{1,3}(?:,\d{3})*', texte_detecte)
-                            if match:
-                                prix = int(match.group().replace(',', '')) 
-                                print(prix-1)
-                                prix_vente = prix-1
-                                cliquer_sur_position(1528, 344)
-                                pydirectinput.keyDown("ctrl")
-                                pydirectinput.press("a") 
-                                pydirectinput.keyUp("ctrl") 
-                                time.sleep(0.1)
-                                pydirectinput.write(str(prix_vente))
-                                cliquer_sur_position(1809, 403)
+        while True:
+            texte_detecte_arret = detecter_texte(zone_texte_arret)
+            if "Vous ne pouvez pas poster" in texte_detecte_arret:  
+                print("Texte détecté !")
+                return  
 
-                    else:
-                        break
+            position = detecter_image(image_path, zone_ecran3)
+            if position:
+                x, y = position
+                cliquer_sur_position(x, y) 
+                time.sleep(1)
 
+                zone_texte = (1717, 548, 1823, 593)  
+                texte_detecte = detecter_texte2(zone_texte)
+                if texte_detecte:   
+                    print(f"Texte détecté : {texte_detecte}")
+                    match = re.search(r'\d{1,3}(?:,\d{3})*', texte_detecte)
+                    if match:
+                        prix = int(match.group().replace(',', '')) 
+                        print(prix-1)
+                        prix_vente = prix-1
+                        cliquer_sur_position(1528, 344)
+                        pydirectinput.keyDown("ctrl")
+                        pydirectinput.press("a") 
+                        pydirectinput.keyUp("ctrl") 
+                        time.sleep(0.1)
+                        pydirectinput.write(str(prix_vente))
+                        cliquer_sur_position(1809, 403)
+            else:
+                break
+    
 def on_f11_press(event):
     if event.name == 'f11':
         keyboard.unhook_all() 
