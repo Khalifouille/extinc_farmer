@@ -136,19 +136,18 @@ def vente_inv_plein():
             "images_loot/antizin_shot.png",
             "images_loot/flesh_dot.png",
             "images_loot/berserker_shot.png",
-            "images_loot/molotov.png",
             "images_loot/carabine_mk2.png",
             "images_loot/mitralleuse.png",
             "images_loot/carabine_spe.png",
             "images_loot/carabine.png",
             "images_loot/cog.png"
         ]
-    
-    zone_ecran = (30, 167, 1180, 432)
+        
+    zone_ecran3 = (31, 172, 1185, 433)
     
     for image_path in images_a_detecter:
                 while True:
-                    position = detecter_image(image_path, zone_ecran)
+                    position = detecter_image(image_path, zone_ecran3)
                     if position:
                         x, y = position
                         cliquer_sur_position(x, y) 
@@ -187,7 +186,18 @@ def main():
         ]
 
         images_a_return = [
-            "images_loot/molotov.png"
+            "images_loot/molotov.png",
+            "images_loot/caisse.png", 
+            "images_loot/kevlar.png",
+            "images_loot/antizin_shot.png",
+            "images_loot/flesh_dot.png",
+            "images_loot/berserker_shot.png",
+            "images_loot/molotov.png",
+            "images_loot/carabine_mk2.png",
+            "images_loot/mitralleuse.png",
+            "images_loot/carabine_spe.png",
+            "images_loot/carabine.png",
+            "images_loot/cog.png"
         ]
 
         start_time = time.time()
@@ -231,7 +241,7 @@ def main():
                     else:
                         break
 
-            zone_texte = (1669, 551, 1719, 581)  
+            zone_texte = (1665, 115, 1719, 133)  
             texte_detecte = detecter_texte(zone_texte)
             if texte_detecte:
                 print(f"Texte détecté : {texte_detecte}")
@@ -239,8 +249,8 @@ def main():
                 if match:
                     poids = int(match.group())
                     if poids >= 30:
-                        vente_inv_plein()   
                         print("+30kg")
+                        vente_inv_plein()
             else:
                 print("Aucun texte détecté.")
 ## ---------------------------------------------------------------------------------------------
