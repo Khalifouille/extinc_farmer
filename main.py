@@ -82,15 +82,19 @@ def detecter_texte(zone, dossier_images="captures_texte"):
 def detecter_texte2(zone, dossier_images="captures_texte"):
     if not os.path.exists(dossier_images):
         os.makedirs(dossier_images)
+
     screenshot = np.array(ImageGrab.grab(bbox=zone))
     screenshot = cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR)
     chemin_image2 = os.path.join(dossier_images, f"capture_prix.png")
+    
     cv2.imwrite(chemin_image2, screenshot)
-    ## print(f"Image enregistrée : {chemin_image}")
-    ## gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
-    ## gray = cv2.GaussianBlur(gray, (5, 5), 0)
-    ## _, gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    texte = pytesseract.image_to_string(screenshot, config='--psm 6')
+    gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)  
+    _, binary = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    blur = cv2.GaussianBlur(binary, (3, 3), 0) 
+    chemin_image_pretraitee = os.path.join(dossier_images, f"capture_prix_pretraitee.png")
+    cv2.imwrite(chemin_image_pretraitee, blur)
+    texte = pytesseract.image_to_string(blur, config='--psm 6') 
+
     return texte.strip()
 
 def detecter_image(image_path, zone, confidence=0.8):
@@ -172,13 +176,15 @@ def vente_inv_plein():
                 cliquer_sur_position(x, y) 
                 time.sleep(1)
 
-                zone_texte = (1717, 548, 1823, 593)  
+                zone_texte = (1534, 551, 1888, 591)  
                 texte_detecte = detecter_texte2(zone_texte)
-                if texte_detecte:   
+                if texte_detecte:       
                     print(f"Texte détecté : {texte_detecte}")
-                    match = re.search(r'\d{1,3}(?:,\d{3})*', texte_detecte)
+                    match = re.search(r'\$\d{1,3}(?:,\d{3})*', texte_detecte)
                     if match:
-                        prix = int(match.group().replace(',', '')) 
+                        prix_str = match.group().replace('$', '')
+                        prix = int(prix_str.replace(',', ''))
+                        print(prix)
                         print(prix-1)
                         prix_vente = prix-1
                         cliquer_sur_position(1528, 344)
@@ -284,7 +290,7 @@ def main():
                 match = re.search(r'\b(\d+)(?:[.,]\d+)?kg\b', texte_detecte)
                 if match:
                     poids = int(match.group(1))
-                    if poids >= 30:
+                    if poids >= 1:
                         print(poids)
                         vente_inv_plein()
             else:
