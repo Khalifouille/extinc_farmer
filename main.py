@@ -122,6 +122,40 @@ def actualier_reclamer():
     fermer_tab()
     time.sleep(1)
 
+def vente_inv_plein():
+    time.sleep(0.1)
+    ouvrir_tab()
+    time.sleep(0.1)
+    clique_marcher()
+    time.sleep(0.1)
+    pydirectinput.click(1012, 139)
+    time.sleep(0.1)
+    images_a_detecter = [
+            "images_loot/caisse.png", 
+            "images_loot/kevlar.png",
+            "images_loot/antizin_shot.png",
+            "images_loot/flesh_dot.png",
+            "images_loot/berserker_shot.png",
+            "images_loot/molotov.png",
+            "images_loot/carabine_mk2.png",
+            "images_loot/mitralleuse.png",
+            "images_loot/carabine_spe.png",
+            "images_loot/carabine.png",
+            "images_loot/cog.png"
+        ]
+    
+    zone_ecran = (30, 167, 1180, 432)
+    
+    for image_path in images_a_detecter:
+                while True:
+                    position = detecter_image(image_path, zone_ecran)
+                    if position:
+                        x, y = position
+                        cliquer_sur_position(x, y) 
+                        time.sleep(1)
+                    else:
+                        break
+
 def on_f11_press(event):
     if event.name == 'f11':
         keyboard.unhook_all() 
@@ -205,6 +239,7 @@ def main():
                 if match:
                     poids = int(match.group())
                     if poids >= 30:
+                        vente_inv_plein()   
                         print("+30kg")
             else:
                 print("Aucun texte détecté.")
