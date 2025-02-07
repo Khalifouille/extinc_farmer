@@ -82,6 +82,7 @@ def detecter_texte(zone, dossier_images="captures_texte"):
 def detecter_texte2(zone, dossier_images="captures_texte"):
     if not os.path.exists(dossier_images):
         os.makedirs(dossier_images)
+    
     screenshot = np.array(ImageGrab.grab(bbox=zone))
     screenshot = cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR)
     chemin_image2 = os.path.join(dossier_images, f"capture_prix.png")
@@ -92,12 +93,12 @@ def detecter_texte2(zone, dossier_images="captures_texte"):
         binary = cv2.bitwise_not(binary)
     blur = cv2.GaussianBlur(binary, (3, 3), 0)
     kernel = np.ones((1,1), np.uint8)
-    dilated = cv2.erode(binary, kernel, iterations=1)
+    dilated = cv2.erode(blur, kernel, iterations=1)
     chemin_image_pretraitee = os.path.join(dossier_images, f"capture_prix_pretraitee.png")
     cv2.imwrite(chemin_image_pretraitee, dilated)
-    custom_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789.,$'  
+    custom_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789.,$'
     texte = pytesseract.image_to_string(dilated, config=custom_config)
-    texte = texte.replace("9$", "$") 
+    texte = texte.replace("9$", "$").strip()
     return texte.strip()
 
 def detecter_image(image_path, zone, confidence=0.8):
@@ -179,18 +180,20 @@ def vente_inv_plein():
                 cliquer_sur_position(x, y) 
                 time.sleep(1)
 
-                zone_texte = (1534, 551, 1888, 591)  
+                zone_texte = (1534, 551, 1826, 593)  
                 texte_detecte = detecter_texte2(zone_texte)
                 if texte_detecte:       
                     print(f"Texte détecté : {texte_detecte}")
                     
-                    match_avec_symbole = re.search(r'\$\d{1,3}(?:[.,]\d{3})*', texte_detecte)
+                    match_avec_symbole = re.search(r'\$?(\d{1,3}(?:[.,]?\d{3})*)', texte_detecte)
                     match_sans_symbole = re.search(r'\d{1,3}(?:[.,]\d{3})*', texte_detecte)
 
                     if match_avec_symbole:
-                        prix_str = match_avec_symbole.group().replace('$', '').replace('.', '').replace(',', '')
+                        prix_str = match_avec_symbole.group()
+                        print(f"Prix brut détecté : {prix_str}")  
+                        prix_str = prix_str.replace('$', '').replace(',', '')  
                         prix = int(prix_str)
-                        print(f"Prix détecté (avec symbole $) : {prix}")
+                        print(f"Prix converti en entier : {prix}")
                     elif match_sans_symbole:
                         prix_str = match_sans_symbole.group().replace('.', '').replace(',', '')
                         prix = int(prix_str)
