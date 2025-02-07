@@ -191,12 +191,17 @@ def vente_inv_plein():
                     if match_avec_symbole:
                         prix_str = match_avec_symbole.group()
                         print(f"Prix brut détecté : {prix_str}")  
-                        prix_str = prix_str.replace('$', '').replace(',', '')  
-                        prix_str = prix_str.replace(' ', '')  
-                        if prix_str.endswith('0') and prix_str[-2] == '.':
-                            prix_str = prix_str[:-1]  
-                        prix = int(prix_str)
-                        print(f"Prix converti en entier : {prix}")
+                        if '$' in prix_str:
+                            prix_str = prix_str.replace('$', '').replace(',', '')  
+                            prix_str = prix_str.replace(' ', '')  
+                            if prix_str.endswith('0') and prix_str[-2] == '.':
+                                prix_str = prix_str[:-1] 
+
+                            prix = int(prix_str)
+                            print(f"Prix converti en entier : {prix}")
+                        else:
+                            print("Aucun prix avec symbole $ détecté.")
+                            
                     elif match_sans_symbole:
                         prix_str = match_sans_symbole.group().replace('.', '').replace(',', '')
                         prix = int(prix_str)
