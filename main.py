@@ -1,4 +1,5 @@
 import time
+import json
 import psutil
 import keyboard
 import sys
@@ -20,8 +21,10 @@ def est_fivem_lance():
 
 def mettre_fivem_premier_plan():
     def callback(hwnd, extra):
+        titre = win32gui.GetWindowText(hwnd)
+        print(f"Détection de fenêtre : {titre} (hwnd: {hwnd})")
         if win32gui.IsWindowVisible(hwnd):
-            if "FiveM" in win32gui.GetWindowText(hwnd):
+            if "FiveM® by Cfx.re - EU [NOT-RP] GLife: Extinction & Freeroam || PvP || Zombie || World leaderboard || discord.gg/gtalife" in win32gui.GetWindowText(hwnd):
                 win32gui.SetForegroundWindow(hwnd)
                 win32gui.ShowWindow(hwnd, win32con.SW_MAXIMIZE)
                 time.sleep(1)
@@ -65,6 +68,19 @@ def supprimer_item():
         pydirectinput.click(button='right')
         pydirectinput.click(button='right')
 
+def charger_prix_manuels():
+    fichier_prix = "prix_manuels.json"
+    if os.path.exists(fichier_prix):
+        with open(fichier_prix, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {}
+
+def obtenir_prix(item, prix_detecte):
+    prix_manuels = charger_prix_manuels()
+    if prix_detecte:
+        return prix_detecte - 1
+    return prix_manuels.get(item, 999999)
+
 def detecter_texte(zone, dossier_images="captures_texte"):
     if not os.path.exists(dossier_images):
         os.makedirs(dossier_images)
@@ -99,6 +115,22 @@ def detecter_texte2(zone, dossier_images="captures_texte"):
     custom_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789.,$'
     texte = pytesseract.image_to_string(dilated, config=custom_config)
     texte = texte.replace("9$", "$").strip()
+    return texte.strip()
+
+def detecter_texte3(zone, dossier_images="captures_texte"):
+    if not os.path.exists(dossier_images):
+        os.makedirs(dossier_images)
+    screenshot = np.array(ImageGrab.grab(bbox=zone))
+    screenshot = cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR)
+    gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
+    _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    if np.mean(binary) > 127:
+        binary = cv2.bitwise_not(binary)
+    chemin_image3 = os.path.join(dossier_images, f"debug_capture.png")
+    chemin_image4 = os.path.join(dossier_images, f"debug_capture_processed.png")
+    cv2.imwrite(chemin_image3, screenshot) 
+    cv2.imwrite(chemin_image4, binary) 
+    texte = pytesseract.image_to_string(binary, config='--psm 6')
     return texte.strip()
 
 def detecter_image(image_path, zone, confidence=0.8):
@@ -169,7 +201,7 @@ def vente_inv_plein():
 
     for image_path in images_a_detecter:
         while True:
-            texte_detecte_arret = detecter_texte(zone_texte_arret)
+            texte_detecte_arret = detecter_texte3(zone_texte_arret)
             if "Vous ne pouvez pas poster" in texte_detecte_arret:  
                 print("Texte détecté !")
                 return  
@@ -200,8 +232,7 @@ def vente_inv_plein():
                             prix = int(prix_str)
                             print(f"Prix converti en entier : {prix}")
                         else:
-                            print("Aucun prix avec symbole $ détecté.")
-                            
+                            print("Aucun prix avec symbole $ détecté.") 
                     elif match_sans_symbole:
                         prix_str = match_sans_symbole.group().replace('.', '').replace(',', '')
                         prix = int(prix_str)
@@ -209,7 +240,6 @@ def vente_inv_plein():
                     else:
                         print("Aucun prix détecté dans le texte.")
                         break
-
                     prix_vente = prix - 1
                     print(f"Prix de vente : {prix_vente}")
 
