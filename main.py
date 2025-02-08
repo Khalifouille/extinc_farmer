@@ -236,16 +236,8 @@ def vente_inv_plein():
 
                 prix_vente_json = obtenir_prix(nom_objet, prix_detecte)
 
-                if prix_detecte:
-                    print(f"Prix détecté : {prix_detecte}")
-                    print(f"Prix du fichier .json : {prix_vente_json}")
-                    if abs(prix_detecte - prix_vente_json) > 1000:
-                        print(f"Le prix détecté {prix_detecte} est trop éloigné du prix dans le .json ({prix_vente_json}), prise en compte du prix détecté.")
-                        prix_vente = prix_detecte
-                    else:
-                        prix_vente = prix_vente_json
-                else:
-                    prix_vente = prix_vente_json  
+                print(f"Prix du fichier .json : {prix_vente_json}")
+                prix_vente = prix_vente_json
 
                 print(f"Prix de vente final : {prix_vente}")
 
