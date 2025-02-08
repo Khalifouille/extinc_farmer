@@ -235,6 +235,11 @@ def vente_inv_plein():
                     print("Aucun texte détecté dans la zone spécifiée.")
 
                 prix_vente = obtenir_prix(nom_objet, prix_detecte)
+
+                if prix_detecte and abs(prix_detecte - prix_vente) > 1000:
+                    print(f"Le prix détecté {prix_detecte} est trop éloigné du prix dans le .json ({prix_vente}), prise en compte du prix du .json.")
+                    prix_vente = prix_detecte
+
                 print(f"Prix de vente final : {prix_vente}")
 
                 cliquer_sur_position(1528, 344)
@@ -247,6 +252,7 @@ def vente_inv_plein():
             else:
                 print(f"Aucune image détectée pour {nom_objet}.")
                 break
+
     
 def on_f11_press(event):
     if event.name == 'f11':
