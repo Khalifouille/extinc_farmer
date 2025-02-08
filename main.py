@@ -22,7 +22,6 @@ def est_fivem_lance():
 def mettre_fivem_premier_plan():
     def callback(hwnd, extra):
         titre = win32gui.GetWindowText(hwnd)
-        print(f"Détection de fenêtre : {titre} (hwnd: {hwnd})")
         if win32gui.IsWindowVisible(hwnd):
             if "FiveM® by Cfx.re - EU [NOT-RP] GLife: Extinction & Freeroam || PvP || Zombie || World leaderboard || discord.gg/gtalife" in win32gui.GetWindowText(hwnd):
                 win32gui.SetForegroundWindow(hwnd)
