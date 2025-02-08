@@ -78,7 +78,7 @@ def charger_prix_manuels():
 def obtenir_prix(item, prix_detecte):
     prix_manuels = charger_prix_manuels()
     if prix_detecte:
-        return prix_detecte - 1
+        return prix_detecte
     return prix_manuels.get(item, 999999)
 
 def detecter_texte(zone, dossier_images="captures_texte"):
@@ -234,11 +234,18 @@ def vente_inv_plein():
                 else:
                     print("Aucun texte détecté dans la zone spécifiée.")
 
-                prix_vente = obtenir_prix(nom_objet, prix_detecte)
+                prix_vente_json = obtenir_prix(nom_objet, prix_detecte)
 
-                if prix_detecte and abs(prix_detecte - prix_vente) > 1000:
-                    print(f"Le prix détecté {prix_detecte} est trop éloigné du prix dans le .json ({prix_vente}), prise en compte du prix du .json.")
-                    prix_vente = prix_detecte
+                if prix_detecte:
+                    print(f"Prix détecté : {prix_detecte}")
+                    print(f"Prix du fichier .json : {prix_vente_json}")
+                    if abs(prix_detecte - prix_vente_json) > 1000:
+                        print(f"Le prix détecté {prix_detecte} est trop éloigné du prix dans le .json ({prix_vente_json}), prise en compte du prix détecté.")
+                        prix_vente = prix_detecte
+                    else:
+                        prix_vente = prix_vente_json
+                else:
+                    prix_vente = prix_vente_json  
 
                 print(f"Prix de vente final : {prix_vente}")
 
