@@ -183,77 +183,69 @@ def vente_inv_plein():
     time.sleep(0.1)
     pydirectinput.click(1012, 139)
     time.sleep(0.1)
+
     images_a_detecter = [
-            "images_loot/caisse.png", 
-            "images_loot/kevlar.png",
-            "images_loot/antizin_shot.png",
-            "images_loot/flesh_dot.png",
-            "images_loot/berserker_shot.png",
-            "images_loot/carabine_mk2.png",
-            "images_loot/mitralleuse.png",
-            "images_loot/carabine_spe.png",
-            "images_loot/carabine.png",
-            "images_loot/cog.png"
-        ]
-        
+        "images_loot/caisse.png",
+        "images_loot/kevlar.png",
+        "images_loot/antizin_shot.png",
+        "images_loot/flesh_dot.png",
+        "images_loot/berserker_shot.png",
+        "images_loot/carabine_mk2.png",
+        "images_loot/mitralleuse.png",
+        "images_loot/carabine_spe.png",
+        "images_loot/carabine.png",
+    ]
+
     zone_ecran3 = (31, 172, 1185, 433)
-    zone_texte_arret = (1519, 945, 1901, 1024)  
+    zone_texte_arret = (1519, 945, 1901, 1024)
 
     for image_path in images_a_detecter:
+        nom_objet = image_path.split("/")[-1].replace(".png", "")
+
         while True:
             texte_detecte_arret = detecter_texte3(zone_texte_arret)
-            if "Vous ne pouvez pas poster" in texte_detecte_arret:  
-                print("Texte détecté !")
+            if "Vous ne pouvez pas poster" in texte_detecte_arret:
+                print("Texte détecté ! Vente arrêtée.")
                 return  
 
             position = detecter_image(image_path, zone_ecran3)
             if position:
                 x, y = position
-                cliquer_sur_position(x, y) 
+                cliquer_sur_position(x, y)
                 time.sleep(1)
 
-                zone_texte = (1534, 551, 1826, 593)  
+                zone_texte = (1534, 551, 1826, 593)
                 texte_detecte = detecter_texte2(zone_texte)
-                if texte_detecte:       
+
+                prix_detecte = None
+
+                if texte_detecte:
                     print(f"Texte détecté : {texte_detecte}")
-                    
+
                     match_avec_symbole = re.search(r'\$?(\d{1,3}(?:[.,]?\d{3})*)', texte_detecte)
                     match_sans_symbole = re.search(r'\d{1,3}(?:[.,]\d{3})*', texte_detecte)
 
                     if match_avec_symbole:
-                        prix_str = match_avec_symbole.group()
-                        print(f"Prix brut détecté : {prix_str}")  
-                        if '$' in prix_str:
-                            prix_str = prix_str.replace('$', '').replace(',', '')  
-                            prix_str = prix_str.replace(' ', '')  
-                            if prix_str.endswith('0') and prix_str[-2] == '.':
-                                prix_str = prix_str[:-1] 
-
-                            prix = int(prix_str)
-                            print(f"Prix converti en entier : {prix}")
-                        else:
-                            print("Aucun prix avec symbole $ détecté.") 
+                        prix_str = match_avec_symbole.group().replace('$', '').replace(',', '').replace(' ', '')
+                        prix_detecte = int(prix_str) if prix_str.isdigit() else None
                     elif match_sans_symbole:
                         prix_str = match_sans_symbole.group().replace('.', '').replace(',', '')
-                        prix = int(prix_str)
-                        print(f"Prix détecté (sans symbole $) : {prix}")
-                    else:
-                        print("Aucun prix détecté dans le texte.")
-                        break
-                    prix_vente = prix - 1
-                    print(f"Prix de vente : {prix_vente}")
-
-                    cliquer_sur_position(1528, 344)
-                    pydirectinput.keyDown("ctrl")
-                    pydirectinput.press("a") 
-                    pydirectinput.keyUp("ctrl") 
-                    time.sleep(0.1)
-                    pydirectinput.write(str(prix_vente))
-                    cliquer_sur_position(1809, 403)
+                        prix_detecte = int(prix_str) if prix_str.isdigit() else None
                 else:
                     print("Aucun texte détecté dans la zone spécifiée.")
+
+                prix_vente = obtenir_prix(nom_objet, prix_detecte)
+                print(f"Prix de vente final : {prix_vente}")
+
+                cliquer_sur_position(1528, 344)
+                pydirectinput.keyDown("ctrl")
+                pydirectinput.press("a") 
+                pydirectinput.keyUp("ctrl")
+                time.sleep(0.1)
+                pydirectinput.write(str(prix_vente))
+                cliquer_sur_position(1809, 403)
             else:
-                print("Aucune image détectée.")
+                print(f"Aucune image détectée pour {nom_objet}.")
                 break
     
 def on_f11_press(event):
@@ -283,7 +275,6 @@ def main():
             "images_loot/mitralleuse.png",
             "images_loot/carabine_spe.png",
             "images_loot/carabine.png",
-            "images_loot/cog.png"
         ]
 
         images_a_return = [
@@ -298,7 +289,6 @@ def main():
             "images_loot/mitralleuse.png",
             "images_loot/carabine_spe.png",
             "images_loot/carabine.png",
-            "images_loot/cog.png"
         ]
 
         start_time = time.time()
