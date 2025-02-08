@@ -75,10 +75,10 @@ def charger_prix_manuels():
             return json.load(f)
     return {}
 
-def obtenir_prix(item, prix_detecte):
+def obtenir_prix(item, prix_detecte):   
     prix_manuels = charger_prix_manuels()
     if prix_detecte:
-        return prix_detecte
+        return prix_manuels.get(item, prix_detecte)
     return prix_manuels.get(item, 999999)
 
 def detecter_texte(zone, dossier_images="captures_texte"):
@@ -204,7 +204,8 @@ def vente_inv_plein():
 
         while True:
             texte_detecte_arret = detecter_texte3(zone_texte_arret)
-            if "Vous ne pouvez pas poster" in texte_detecte_arret:
+            print(texte_detecte_arret)
+            if "20 offres de" in texte_detecte_arret:
                 print("Texte détecté ! Vente arrêtée.")
                 return  
 
