@@ -13,6 +13,9 @@ from PIL import ImageGrab
 import pytesseract
 import requests
 import re
+import threading
+import tkinter as tk
+from tkinter import messagebox
 
 def est_fivem_lance():
     for process in psutil.process_iter(['pid', 'name']):
@@ -88,10 +91,6 @@ def detecter_texte(zone, dossier_images="captures_texte"):
     screenshot = cv2.cvtColor(screenshot, cv2.COLOR_RGB2BGR)
     chemin_image = os.path.join(dossier_images, f"capture_kg.png")
     cv2.imwrite(chemin_image, screenshot)
-    ## print(f"Image enregistrée : {chemin_image}")
-    ## gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
-    ## gray = cv2.GaussianBlur(gray, (5, 5), 0)
-    ## _, gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     texte = pytesseract.image_to_string(screenshot, config='--psm 6')
     return texte.strip()
 
@@ -283,112 +282,143 @@ def vente_inv_plein():
                 print(f"Aucune image détectée pour {nom_objet}.")
                 break
 
-    
 def on_f11_press(event):
     if event.name == 'f11':
         keyboard.unhook_all() 
         os._exit(0)  
 
-def main():
-    keyboard.on_press(on_f11_press)
+class FiveMBotApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("FiveM Bot")
+        self.root.geometry("400x200")
 
-    if est_fivem_lance():
-        mettre_fivem_premier_plan()
-        time.sleep(2)
-        prendre_arme()
+        self.running = False
+        self.thread = None
 
-        zone_ecran = (126, 115, 1798, 539)
-        zone_ecran2 = (124, 555 , 1805, 869)
+        self.start_button = tk.Button(root, text="Démarrer", command=self.start_bot)
+        self.start_button.pack(pady=10)
 
-        images_a_detecter = [
-            "images_loot/caisse.png", 
-            "images_loot/kevlar.png",
-            "images_loot/antizin_shot.png",
-            "images_loot/flesh_dot.png",
-            "images_loot/berserker_shot.png",
-            "images_loot/molotov.png",
-            "images_loot/carabine_mk2.png",
-            "images_loot/mitralleuse.png",
-            "images_loot/carabine_spe.png",
-            "images_loot/carabine.png",
-        ]
+        self.stop_button = tk.Button(root, text="Arrêter", command=self.stop_bot, state=tk.DISABLED)
+        self.stop_button.pack(pady=10)
 
-        images_a_return = [
-            "images_loot/molotov.png",
-            "images_loot/caisse.png", 
-            "images_loot/kevlar.png",
-            "images_loot/antizin_shot.png",
-            "images_loot/flesh_dot.png",
-            "images_loot/berserker_shot.png",
-            "images_loot/molotov.png",
-            "images_loot/carabine_mk2.png",
-            "images_loot/mitralleuse.png",
-            "images_loot/carabine_spe.png",
-            "images_loot/carabine.png",
-        ]
+        self.status_label = tk.Label(root, text="Statut: Arrêté", fg="red")
+        self.status_label.pack(pady=10)
 
-        start_time = time.time()
+    def start_bot(self):
+        if not self.running:
+            self.running = True
+            self.start_button.config(state=tk.DISABLED)
+            self.stop_button.config(state=tk.NORMAL)
+            self.status_label.config(text="Statut: En cours", fg="green")
 
-        while True:
-            if time.time() - start_time >= 180:
-                print("Vente au marché !")
-                actualier_reclamer()
-                start_time = time.time()
+            self.thread = threading.Thread(target=self.run_bot)
+            self.thread.start()
 
-            viser_et_lancer_molotov()
-            time.sleep(1)
-            ramasser_loot()
-            time.sleep(1)
-            ouvrir_tab()
-            time.sleep(1)
+    def stop_bot(self):
+        if self.running:
+            self.running = False
+            self.start_button.config(state=tk.NORMAL)
+            self.stop_button.config(state=tk.DISABLED)
+            self.status_label.config(text="Statut: Arrêté", fg="red")
 
-## CHECK SI IMAGE EST SUR ECRAN EN BOUCLE JUSQUA PLUS D'IMAGE A DETECTER ##
+    def run_bot(self):
+        keyboard.on_press(on_f11_press)
 
-            for image_path in images_a_detecter:
-                while True:
-                    position = detecter_image(image_path, zone_ecran)
-                    if position:
-                        x, y = position
-                        cliquer_sur_position(x, y) 
-                        time.sleep(1)
-                    else:
-                        break
-
-            supprimer_item()
-
-## CHECK SI IMAGE A RETURN EST SUR ECRAN EN BOUCLE JUSQUA PLUS D'IMAGE A DETECTER ##
-
-            for image_path in images_a_return:
-                while True:
-                    position = detecter_image(image_path, zone_ecran2)
-                    if position:
-                        x, y = position
-                        cliquer_sur_position(x, y) 
-                        time.sleep(1)
-                    else:
-                        break       
-
-            zone_texte = (1665, 115, 1719, 133)  
-            texte_detecte = detecter_texte(zone_texte)
-            if texte_detecte:
-                # print(f"Texte détecté : {texte_detecte}")
-                match = re.search(r'\b(\d+)(?:[.,]\d+)?kg\b', texte_detecte)
-                if match:
-                    poids = int(match.group(1))
-                    if poids >= 1:
-                        print(poids)
-                        vente_inv_plein()
-            else:
-                print("Aucun texte détecté.")
-## ---------------------------------------------------------------------------------------------
-
-            time.sleep(1)
-            fermer_tab()
-            time.sleep(1)
+        if est_fivem_lance():
+            mettre_fivem_premier_plan()
+            time.sleep(2)
             prendre_arme()
-            time.sleep(120)  
-    else:
-        sys.exit()
+
+            zone_ecran = (126, 115, 1798, 539)
+            zone_ecran2 = (124, 555 , 1805, 869)
+
+            images_a_detecter = [
+                "images_loot/caisse.png", 
+                "images_loot/kevlar.png",
+                "images_loot/antizin_shot.png",
+                "images_loot/flesh_dot.png",
+                "images_loot/berserker_shot.png",
+                "images_loot/molotov.png",
+                "images_loot/carabine_mk2.png",
+                "images_loot/mitralleuse.png",
+                "images_loot/carabine_spe.png",
+                "images_loot/carabine.png",
+            ]
+
+            images_a_return = [
+                "images_loot/molotov.png",
+                "images_loot/caisse.png", 
+                "images_loot/kevlar.png",
+                "images_loot/antizin_shot.png",
+                "images_loot/flesh_dot.png",
+                "images_loot/berserker_shot.png",
+                "images_loot/molotov.png",
+                "images_loot/carabine_mk2.png",
+                "images_loot/mitralleuse.png",
+                "images_loot/carabine_spe.png",
+                "images_loot/carabine.png",
+            ]
+
+            start_time = time.time()
+
+            while self.running:
+                if time.time() - start_time >= 180:
+                    print("Vente au marché !")
+                    actualier_reclamer()
+                    start_time = time.time()
+
+                viser_et_lancer_molotov()
+                time.sleep(1)
+                ramasser_loot()
+                time.sleep(1)
+                ouvrir_tab()
+                time.sleep(1)
+
+                for image_path in images_a_detecter:
+                    while self.running:
+                        position = detecter_image(image_path, zone_ecran)
+                        if position:
+                            x, y = position
+                            cliquer_sur_position(x, y) 
+                            time.sleep(1)
+                        else:
+                            break
+
+                supprimer_item()
+
+                for image_path in images_a_return:
+                    while self.running:
+                        position = detecter_image(image_path, zone_ecran2)
+                        if position:
+                            x, y = position
+                            cliquer_sur_position(x, y) 
+                            time.sleep(1)
+                        else:
+                            break       
+
+                zone_texte = (1665, 115, 1719, 133)  
+                texte_detecte = detecter_texte(zone_texte)
+                if texte_detecte:
+                    match = re.search(r'\b(\d+)(?:[.,]\d+)?kg\b', texte_detecte)
+                    if match:
+                        poids = int(match.group(1))
+                        if poids >= 1:
+                            print(poids)
+                            vente_inv_plein()
+                else:
+                    print("Aucun texte détecté.")
+
+                time.sleep(1)
+                fermer_tab()
+                time.sleep(1)
+                prendre_arme()
+                time.sleep(120)  
+        else:
+            messagebox.showerror("Erreur", "FiveM n'est pas lancé.")
+            self.stop_bot()
 
 if __name__ == "__main__":
-    main()
+    root = tk.Tk()
+    app = FiveMBotApp(root)
+    root.mainloop()
