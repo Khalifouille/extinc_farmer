@@ -11,6 +11,7 @@ import cv2
 import numpy as np
 from PIL import ImageGrab
 import pytesseract
+import requests
 import re
 
 def est_fivem_lance():
@@ -174,6 +175,56 @@ def actualier_reclamer():
     fermer_tab()
     time.sleep(1)
 
+BASE_API_URL = "https://api.gtaliferp.fr:8443/v1/extinction/marketplace/sell/"
+
+ITEMS_API = {
+    "loot_crate_medium": "caisse",
+    "kevlar": "kevlar",
+    "antizin_shot": "antizin_shot",
+    "flesh_dot": "flesh_dot",
+    "berserker_shot": "berserker_shot",
+    "carabine_mk2": "carabine_mk2",
+    "mitralleuse": "mitralleuse",
+    "carabine_spe": "carabine_spe",
+    "carabine": "carabine"
+}
+
+prix_cache = {}
+
+def obtenir_prix_api(nom_objet):
+    if nom_objet in prix_cache:
+        return prix_cache[nom_objet]
+
+    item_api_name = None
+    for api_id, nom_fichier in ITEMS_API.items():
+        if nom_fichier == nom_objet:
+            item_api_name = api_id
+            break
+
+    if not item_api_name:
+        print(f"Aucun ID API trouvé ! ")
+        return None
+
+    url = f"{BASE_API_URL}{item_api_name}"
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            if isinstance(data, list) and len(data) > 0:
+                dernier_objet = data[-1]
+                prix = dernier_objet.get("price", 0)
+                prix_ajuste = max(0, prix - 1)  
+                prix_cache[nom_objet] = prix_ajuste  
+                return prix_ajuste
+            else:
+                print(f"Aucune vente trouvée pour {nom_objet}.")
+        else:
+            print(f"Erreur API ({response.status_code}) pour {nom_objet}")
+    except Exception as e:
+        print(f"Erreur lors de la récupération du prix de {nom_objet}: {e}")
+
+    return None
+
 def vente_inv_plein():
     time.sleep(0.1)
     ouvrir_tab()
@@ -205,7 +256,7 @@ def vente_inv_plein():
             texte_detecte_arret = detecter_texte3(zone_texte_arret)
             print(texte_detecte_arret)
             if "20 offres de" in texte_detecte_arret:
-                print("Texte détecté ! Vente arrêtée.")
+                print("Vente arrêtée.")
                 return  
 
             position = detecter_image(image_path, zone_ecran3)
@@ -214,32 +265,12 @@ def vente_inv_plein():
                 cliquer_sur_position(x, y)
                 time.sleep(1)
 
-                zone_texte = (1534, 551, 1826, 593)
-                texte_detecte = detecter_texte2(zone_texte)
+                prix_vente = obtenir_prix_api(nom_objet)
+                if prix_vente is None:
+                    print(f"Impossible de récupérer le prix de {nom_objet}.")
+                    continue
 
-                prix_detecte = None
-
-                if texte_detecte:
-                    print(f"Texte détecté : {texte_detecte}")
-
-                    match_avec_symbole = re.search(r'\$?(\d{1,3}(?:[.,]?\d{3})*)', texte_detecte)
-                    match_sans_symbole = re.search(r'\d{1,3}(?:[.,]\d{3})*', texte_detecte)
-
-                    if match_avec_symbole:
-                        prix_str = match_avec_symbole.group().replace('$', '').replace(',', '').replace(' ', '')
-                        prix_detecte = int(prix_str) if prix_str.isdigit() else None
-                    elif match_sans_symbole:
-                        prix_str = match_sans_symbole.group().replace('.', '').replace(',', '')
-                        prix_detecte = int(prix_str) if prix_str.isdigit() else None
-                else:
-                    print("Aucun texte détecté dans la zone spécifiée.")
-
-                prix_vente_json = obtenir_prix(nom_objet, prix_detecte)
-
-                print(f"Prix du fichier .json : {prix_vente_json}")
-                prix_vente = prix_vente_json
-
-                print(f"Prix de vente final : {prix_vente}")
+                print(f"Vente de {nom_objet} au prix de {prix_vente}")
 
                 cliquer_sur_position(1528, 344)
                 pydirectinput.keyDown("ctrl")
