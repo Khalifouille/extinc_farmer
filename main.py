@@ -180,13 +180,13 @@ BASE_API_URL = "https://api.gtaliferp.fr:8443/v1/extinction/marketplace/sell/"
 ITEMS_API = {
     "loot_crate_medium": "caisse",
     "kevlar": "kevlar",
-    "antizin_shot": "antizin_shot",
-    "flesh_dot": "flesh_dot",
-    "berserker_shot": "berserker_shot",
-    "carabine_mk2": "carabine_mk2",
-    "mitralleuse": "mitralleuse",
-    "carabine_spe": "carabine_spe",
-    "carabine": "carabine"
+    "drug_antizin": "antizin_shot",
+    "drug_zombie": "flesh_dot",
+    "drug_berserker": "berserker_shot",
+    "weapon_carbinerifle_mk2": "carabine_mk2",
+    "weapon_mg": "mitralleuse",
+    "weapon_specialcarbine": "carabine_spe",
+    "weapon_carbinerifle": "carabine"
 }
 
 prix_cache = {}
